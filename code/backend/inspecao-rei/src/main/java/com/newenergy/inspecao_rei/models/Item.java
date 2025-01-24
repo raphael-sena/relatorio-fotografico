@@ -1,11 +1,27 @@
 package com.newenergy.inspecao_rei.models;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.Objects;
 
 @Entity
 @Table(name = "tb_item")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 public class Item {
 
     @Id
@@ -13,54 +29,12 @@ public class Item {
     private Long id;
 
     @Column
+    private String codigo;
+
+    @Column
     private byte[] imagem;
 
     @ManyToOne
     @JoinColumn(name="relatorio_id", nullable=false)
     private Relatorio relatorio;
-
-    public Item() {}
-
-    public Item(Long id, byte[] imagem, Relatorio relatorio) {
-        this.id = id;
-        this.imagem = imagem;
-        this.relatorio = relatorio;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public byte[] getImagem() {
-        return imagem;
-    }
-
-    public void setImagem(byte[] imagem) {
-        this.imagem = imagem;
-    }
-
-    public Relatorio getRelatorio() {
-        return relatorio;
-    }
-
-    public void setRelatorio(Relatorio relatorio) {
-        this.relatorio = relatorio;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Item item = (Item) o;
-        return Objects.equals(id, item.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }
