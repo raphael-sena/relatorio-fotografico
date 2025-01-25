@@ -6,12 +6,14 @@ import com.newenergy.inspecao_rei.services.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/item")
@@ -22,8 +24,20 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<List<ItemDTO>> findAll() {
-        itemService.findAll();
-        return ResponseEntity.status(HttpStatus.FOUND).build();
+        List<Item> items = itemService.findAll();
+
+        List<ItemDTO> itemDTOs = items.stream()
+                .map(item -> new ItemDTO(
+                        item.getId(),
+                        item.getCodigo(),
+                        item.getImagem(),
+                        item.getRelatorio().getId())
+                )
+                .collect(Collectors.toList());
+
+        return ResponseEntity
+                .ok()
+                .body(itemDTOs);
     }
 
     @GetMapping("/{id}")
