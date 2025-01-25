@@ -1,11 +1,6 @@
 package com.newenergy.inspecao_rei.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,6 +24,8 @@ public class Inspecao {
 
     private LocalDate data;
     private String cliente;
+
+    @Column(name = "pedido_compra")
     private String pedidoCompra;
 
     @OneToOne(mappedBy = "inspecao")

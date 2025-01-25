@@ -16,12 +16,12 @@ public class RelatorioController {
     @Autowired
     private RelatorioService relatorioService;
 
-    @PostMapping
-    public ResponseEntity<Void> criarRelatorio(RelatorioDTO obj) {
-
-        relatorioService.criarRelatorio(obj);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .build();
-    }
+//    @PostMapping
+//    public ResponseEntity<Void> criarRelatorio(RelatorioDTO obj) {
+//
+//        relatorioService.criarRelatorio(obj);
+//        return ResponseEntity
+//                .status(HttpStatus.CREATED)
+//                .build();
+//    }
 }
