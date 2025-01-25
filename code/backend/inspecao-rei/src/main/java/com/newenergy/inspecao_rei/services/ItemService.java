@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +28,8 @@ public class ItemService {
 
     @Transactional
     public Item findById(Long id) {
-        Optional<Item> user = this.itemRepository.findById(id);
-        return user.orElseThrow(() -> new EntityNotFoundException(
+        Optional<Item> item = this.itemRepository.findById(id);
+        return item.orElseThrow(() -> new EntityNotFoundException(
                 "item não encontrado! Id: " + id + ", Tipo: " + Item.class.getName()));
     }
 
@@ -71,16 +70,6 @@ public class ItemService {
         relatorioService.addItem(newObj);
 
         return this.itemRepository.save(newObj);
-    }
-
-    public Item fromDTO(@Valid ItemDTO obj) {
-        Item item = new Item();
-        item.setImagem(obj.getImagem());
-        item.setCodigo(obj.getCodigo());
-
-        Relatorio relatorio = relatorioService.findById(obj.getRelatorioId());
-        item.setRelatorio(relatorio);
-        return item;
     }
 
     public void deletarItem(Long id) {

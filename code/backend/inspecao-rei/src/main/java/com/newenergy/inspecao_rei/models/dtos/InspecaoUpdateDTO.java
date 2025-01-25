@@ -1,6 +1,5 @@
 package com.newenergy.inspecao_rei.models.dtos;
 
-import com.newenergy.inspecao_rei.models.Relatorio;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +9,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class InspecaoCreateDTO {
-
+public class InspecaoUpdateDTO {
+    private Long id;
     private String cliente;
     private String pedidoCompra;
-    private Relatorio relatorio;
 }
