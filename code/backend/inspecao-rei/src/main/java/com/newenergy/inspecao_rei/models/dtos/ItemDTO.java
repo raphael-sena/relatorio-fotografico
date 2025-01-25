@@ -13,6 +13,7 @@ import lombok.Setter;
 public class ItemDTO {
 
     private Long id;
+    private String codigo;
     private byte[] imagem;
-    private Relatorio relatorio;
+    private Long relatorioId;
 }

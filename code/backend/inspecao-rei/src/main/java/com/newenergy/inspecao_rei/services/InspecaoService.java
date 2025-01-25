@@ -6,8 +6,7 @@ import com.newenergy.inspecao_rei.models.dtos.InspecaoCreateDTO;
 import com.newenergy.inspecao_rei.repositories.InspecaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.beans.Transient;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InspecaoService {
@@ -18,7 +17,7 @@ public class InspecaoService {
     @Autowired
     private RelatorioService relatorioService;
 
-    @Transient
+    @Transactional
     public void criarInspecao(InspecaoCreateDTO obj) {
         Inspecao inspecao = new Inspecao();
         inspecao.setCliente(obj.getCliente());
