@@ -62,4 +62,9 @@ public class InspecaoService {
 
         return this.inspecaoRepository.save(newObj);
     }
+
+    public void deletarInspecao(Long id) {
+        findById(id);
+        this.inspecaoRepository.deleteById(id);
+    }
 }

@@ -28,6 +28,6 @@ public class Inspecao {
     @Column(name = "pedido_compra")
     private String pedidoCompra;
 
-    @OneToOne(mappedBy = "inspecao", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "inspecao", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Relatorio relatorio;
 }

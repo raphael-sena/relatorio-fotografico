@@ -70,4 +70,10 @@ public class InspecaoController {
         inspecaoService.updateInspecao(inspecao);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarInspecao(@PathVariable Long id) {
+        this.inspecaoService.deletarInspecao(id);
+        return ResponseEntity.noContent().build();
+    }
 }
