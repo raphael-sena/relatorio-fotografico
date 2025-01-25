@@ -34,4 +34,12 @@ public class RelatorioService {
         Relatorio relatorio = findById(item.getRelatorio().getId());
         relatorio.getItens().add(item);
     }
+
+    @Transactional
+    public void removeItem(Item item) {
+        Relatorio relatorio = findById(item.getRelatorio().getId());
+        relatorio.getItens().remove(item);
+    }
+
+
 }

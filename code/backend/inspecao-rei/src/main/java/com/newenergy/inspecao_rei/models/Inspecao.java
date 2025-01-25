@@ -28,6 +28,6 @@ public class Inspecao {
     @Column(name = "pedido_compra")
     private String pedidoCompra;
 
-    @OneToOne(mappedBy = "inspecao")
+    @OneToOne(mappedBy = "inspecao", fetch = FetchType.EAGER)
     private Relatorio relatorio;
 }

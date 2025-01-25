@@ -1,14 +1,17 @@
 package com.newenergy.inspecao_rei.controllers;
 
+import com.newenergy.inspecao_rei.models.Item;
 import com.newenergy.inspecao_rei.models.dtos.ItemDTO;
 import com.newenergy.inspecao_rei.services.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/item")
@@ -17,12 +20,57 @@ public class ItemController {
     @Autowired
     private ItemService itemService;
 
+    @GetMapping
+    public ResponseEntity<List<ItemDTO>> findAll() {
+        itemService.findAll();
+        return ResponseEntity.status(HttpStatus.FOUND).build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ItemDTO> findById(@PathVariable Long id) {
+        Item item = this.itemService.findById(id);
+
+        ItemDTO itemDTO = new ItemDTO(
+                item.getId(),
+                item.getCodigo(),
+                item.getImagem(),
+                item.getRelatorio().getId()
+        );
+
+        return ResponseEntity.ok(itemDTO);
+    }
+
     @PostMapping
     public ResponseEntity<Void> criarItem(@RequestBody ItemDTO itemDTO) {
 
         itemService.criarItem(itemDTO);
+        URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(itemDTO.getId())
+                .toUri();
+
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .created(uri)
                 .build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> atualizarItem(@RequestBody ItemDTO item, @PathVariable Long id) {
+        if (item.getRelatorioId() == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        item.setId(id);
+        itemService.updateItem(item);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarItem(@PathVariable Long id) {
+        this.itemService.deletarItem(id);
+        return ResponseEntity.noContent().build();
     }
 }
