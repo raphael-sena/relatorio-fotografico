@@ -4,7 +4,6 @@ import com.newenergy.inspecao_rei.models.Inspecao;
 import com.newenergy.inspecao_rei.models.dtos.InspecaoCreateDTO;
 import com.newenergy.inspecao_rei.models.dtos.InspecaoDTO;
 import com.newenergy.inspecao_rei.models.dtos.InspecaoUpdateDTO;
-import com.newenergy.inspecao_rei.models.dtos.ItemDTO;
 import com.newenergy.inspecao_rei.services.InspecaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
