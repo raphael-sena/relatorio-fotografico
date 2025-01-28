@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_inspecao")
@@ -28,6 +30,6 @@ public class Inspecao {
     @Column(name = "pedido_compra")
     private String pedidoCompra;
 
-    @OneToOne(mappedBy = "inspecao", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Relatorio relatorio;
+    @OneToMany(mappedBy = "inspecao", fetch = FetchType.EAGER)
+    private List<Item> itens = new ArrayList<>();
 }

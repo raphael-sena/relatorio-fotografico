@@ -28,6 +28,6 @@ public class Item {
     private byte[] imagem;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="relatorio_id", nullable=false)
-    private Relatorio relatorio;
+    @JoinColumn(name = "inspecao_id")
+    private Inspecao inspecao;
 }

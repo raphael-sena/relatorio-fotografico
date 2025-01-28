@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,5 +17,5 @@ public class InspecaoDTO {
     private LocalDate data;
     private String cliente;
     private String pedidoCompra;
-    private Long relatorioId;
+    private List<ItemMinDTO> itens;
 }

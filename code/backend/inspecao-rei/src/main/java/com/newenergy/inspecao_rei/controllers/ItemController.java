@@ -28,13 +28,11 @@ public class ItemController {
                         item.getId(),
                         item.getCodigo(),
                         item.getImagem(),
-                        item.getRelatorio().getId())
+                        item.getInspecao().getId())
                 )
                 .collect(Collectors.toList());
 
-        return ResponseEntity
-                .ok()
-                .body(itemDTOs);
+        return ResponseEntity.ok().body(itemDTOs);
     }
 
     @GetMapping("/{id}")
@@ -45,7 +43,7 @@ public class ItemController {
                 item.getId(),
                 item.getCodigo(),
                 item.getImagem(),
-                item.getRelatorio().getId()
+                item.getInspecao().getId()
         );
 
         return ResponseEntity.ok(itemDTO);
@@ -53,29 +51,20 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<Void> criarItem(@RequestBody ItemDTO itemDTO) {
-
         itemService.criarItem(itemDTO);
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
+
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(itemDTO.getId())
                 .toUri();
 
-        return ResponseEntity
-                .created(uri)
-                .build();
+        return ResponseEntity.created(uri).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> atualizarItem(@RequestBody ItemDTO item, @PathVariable Long id) {
-        if (item.getRelatorioId() == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .build();
-        }
-
-        item.setId(id);
-        itemService.updateItem(item);
+    public ResponseEntity<Void> atualizarItem(@RequestBody ItemDTO itemDTO, @PathVariable Long id) {
+        itemDTO.setId(id);
+        itemService.updateItem(itemDTO);
         return ResponseEntity.ok().build();
     }
 

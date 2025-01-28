@@ -1,7 +1,7 @@
 package com.newenergy.inspecao_rei.services;
 
+import com.newenergy.inspecao_rei.models.Inspecao;
 import com.newenergy.inspecao_rei.models.Item;
-import com.newenergy.inspecao_rei.models.Relatorio;
 import com.newenergy.inspecao_rei.models.dtos.ItemDTO;
 import com.newenergy.inspecao_rei.repositories.ItemRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,7 +19,7 @@ public class ItemService {
     private ItemRepository itemRepository;
 
     @Autowired
-    private RelatorioService relatorioService;
+    private InspecaoService inspecaoService;
 
     @Transactional
     public List<Item> findAll() {
@@ -30,50 +30,60 @@ public class ItemService {
     public Item findById(Long id) {
         Optional<Item> item = this.itemRepository.findById(id);
         return item.orElseThrow(() -> new EntityNotFoundException(
-                "item não encontrado! Id: " + id + ", Tipo: " + Item.class.getName()));
+                "Item não encontrado! Id: " + id + ", Tipo: " + Item.class.getName()));
     }
 
     @Transactional
     public void criarItem(ItemDTO obj) {
         Item item = new Item();
-
         item.setCodigo(obj.getCodigo());
         item.setImagem(obj.getImagem());
 
-        Relatorio relatorio = relatorioService.findById(obj.getRelatorioId());
-        item.setRelatorio(relatorio);
+        if (obj.getInspecaoId() != null) {
+            Inspecao inspecao = inspecaoService.findById(obj.getInspecaoId());
+            item.setInspecao(inspecao);
+        }
 
-        relatorioService.addItem(item);
         itemRepository.save(item);
+
+        if (obj.getInspecaoId() != null) {
+            Inspecao inspecao = item.getInspecao();
+            if (!inspecao.getItens().contains(item)) {
+                inspecao.getItens().add(item);
+                inspecaoService.criarInspecao(inspecao);
+            }
+        }
     }
 
     @Transactional
     public Item updateItem(ItemDTO obj) {
-        findById(obj.getId());
         Item oldItem = findById(obj.getId());
-        relatorioService.removeItem(oldItem);
 
-        Item newObj = findById(obj.getId());
+        oldItem.setCodigo(obj.getCodigo());
+        oldItem.setImagem(obj.getImagem());
 
-        newObj.setCodigo(obj.getCodigo());
-        newObj.setImagem(obj.getImagem());
-
-        if (obj.getRelatorioId() != null) {
-            Relatorio relatorio = relatorioService.findById(obj.getRelatorioId());
-            if (relatorio != null) {
-                newObj.setRelatorio(relatorio);
-            } else {
-                throw new RuntimeException("Relatório não encontrado.");
-            }
+        if (obj.getInspecaoId() != null) {
+            Inspecao inspecao = inspecaoService.findById(obj.getInspecaoId());
+            oldItem.setInspecao(inspecao);
         }
 
-        relatorioService.addItem(newObj);
+        itemRepository.save(oldItem);
 
-        return this.itemRepository.save(newObj);
+        return oldItem;
     }
 
+
+    @Transactional
     public void deletarItem(Long id) {
-        findById(id);
-        this.itemRepository.deleteById(id);
+        Item item = findById(id);
+
+        Inspecao inspecao = item.getInspecao();
+        if (inspecao != null) {
+            inspecao.getItens().remove(item);
+            inspecaoService.save(inspecao);
+        }
+
+        itemRepository.deleteById(id);
     }
+
 }

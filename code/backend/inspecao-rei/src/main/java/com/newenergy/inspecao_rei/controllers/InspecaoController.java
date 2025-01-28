@@ -1,15 +1,16 @@
 package com.newenergy.inspecao_rei.controllers;
 
 import com.newenergy.inspecao_rei.models.Inspecao;
-import com.newenergy.inspecao_rei.models.dtos.InspecaoCreateDTO;
 import com.newenergy.inspecao_rei.models.dtos.InspecaoDTO;
 import com.newenergy.inspecao_rei.models.dtos.InspecaoUpdateDTO;
+import com.newenergy.inspecao_rei.models.dtos.ItemMinDTO;
 import com.newenergy.inspecao_rei.services.InspecaoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,13 +31,13 @@ public class InspecaoController {
                         inspecao.getData(),
                         inspecao.getCliente(),
                         inspecao.getPedidoCompra(),
-                        inspecao.getRelatorio().getId())
+                        inspecao.getItens().stream()
+                                .map(item -> new ItemMinDTO(item.getId(), item.getCodigo()))
+                                .toList())
                 )
                 .collect(Collectors.toList());
 
-        return ResponseEntity
-                .ok()
-                .body(inspecaoDTOS);
+        return ResponseEntity.ok().body(inspecaoDTOS);
     }
 
     @GetMapping("/{id}")
@@ -48,19 +49,24 @@ public class InspecaoController {
                 inspecao.getData(),
                 inspecao.getCliente(),
                 inspecao.getPedidoCompra(),
-                inspecao.getRelatorio().getId()
+                inspecao.getItens().stream()
+                        .map(item -> new ItemMinDTO(item.getId(), item.getCodigo()))
+                        .toList()
         );
 
         return ResponseEntity.ok(inspecaoDTO);
     }
 
     @PostMapping
-    public ResponseEntity<Void> criarInspecao(@RequestBody InspecaoCreateDTO obj) {
+    public ResponseEntity<Void> criarInspecao(@RequestBody Inspecao obj) {
+        Inspecao createdInspecao = inspecaoService.criarInspecao(obj);
 
-        inspecaoService.criarInspecao(obj);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .build();
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdInspecao.getId())
+                .toUri();
+
+        return ResponseEntity.created(uri).build();
     }
 
     @PutMapping("/{id}")
