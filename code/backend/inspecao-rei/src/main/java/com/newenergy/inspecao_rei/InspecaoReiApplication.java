@@ -22,5 +22,4 @@ public class InspecaoReiApplication {
 			new MainFrame().setVisible(true); // Exibe a janela
 		});
 	}
-
 }
