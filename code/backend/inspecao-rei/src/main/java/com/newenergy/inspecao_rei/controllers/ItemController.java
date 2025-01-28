@@ -5,10 +5,15 @@ import com.newenergy.inspecao_rei.models.dtos.ItemDTO;
 import com.newenergy.inspecao_rei.services.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +32,7 @@ public class ItemController {
                 .map(item -> new ItemDTO(
                         item.getId(),
                         item.getCodigo(),
-                        item.getImagem(),
+                        Arrays.toString(item.getImagem()),
                         item.getInspecao().getId())
                 )
                 .collect(Collectors.toList());
@@ -42,23 +47,11 @@ public class ItemController {
         ItemDTO itemDTO = new ItemDTO(
                 item.getId(),
                 item.getCodigo(),
-                item.getImagem(),
+                Arrays.toString(item.getImagem()),
                 item.getInspecao().getId()
         );
 
         return ResponseEntity.ok(itemDTO);
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> criarItem(@RequestBody ItemDTO itemDTO) {
-        itemService.criarItem(itemDTO);
-
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(itemDTO.getId())
-                .toUri();
-
-        return ResponseEntity.created(uri).build();
     }
 
     @PutMapping("/{id}")

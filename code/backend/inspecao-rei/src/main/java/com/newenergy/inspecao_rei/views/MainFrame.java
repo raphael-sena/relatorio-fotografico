@@ -1,8 +1,5 @@
 package com.newenergy.inspecao_rei.views;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -12,7 +9,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.util.List;
 
 public class MainFrame extends JFrame {
 
@@ -68,12 +64,6 @@ public class MainFrame extends JFrame {
         add(footer, gbc);
 
         setVisible(true);
-    }
-
-    private String[] parseItems(String json) {
-        Gson gson = new Gson();
-        List<String> itemList = gson.fromJson(json, new TypeToken<List<String>>() {}.getType());
-        return itemList.toArray(new String[0]);
     }
 }
 

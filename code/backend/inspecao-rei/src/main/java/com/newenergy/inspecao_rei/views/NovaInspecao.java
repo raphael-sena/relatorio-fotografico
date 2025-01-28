@@ -1,24 +1,51 @@
 package com.newenergy.inspecao_rei.views;
 
-import com.itextpdf.text.*;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.newenergy.inspecao_rei.models.Clientes;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import javax.swing.*;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+import java.util.Objects;
 
 public class NovaInspecao extends JFrame {
 
@@ -41,7 +68,7 @@ public class NovaInspecao extends JFrame {
         add(title, gbc);
 
 
-        // Header Panel
+        // header
         JPanel header = new JPanel(new GridLayout(2, 2, 10, 10));
         JLabel clienteLabel = new JLabel("Cliente:");
         JComboBox<Clientes> clienteComboBox = new JComboBox<>(Clientes.values());
@@ -69,7 +96,7 @@ public class NovaInspecao extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(header, gbc);
 
-        // Table for Items
+        // tabela de itens
         String[] columnNames = {"Código CEMIG", "Imagem"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(tableModel);
@@ -83,7 +110,7 @@ public class NovaInspecao extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         add(tableScrollPane, gbc);
 
-        // Form to Add Items
+        // formulário de item
         JPanel addItemPanel = new JPanel(new GridLayout(2, 2, 10, 10));
         JLabel codigoLabel = new JLabel("Código CEMIG:");
         JTextField codigoField = new JTextField(15);
@@ -112,7 +139,7 @@ public class NovaInspecao extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(addItemPanel, gbc);
 
-        // Button to Add Item
+        // botão adicionar item
         JButton addItemButton = new JButton("Adicionar Item");
         addItemButton.addActionListener(new ActionListener() {
             @Override
@@ -130,7 +157,7 @@ public class NovaInspecao extends JFrame {
             }
         });
 
-        // Button to Remove Item
+        // botão remover item
         JButton removeItemButton = new JButton("Remover Item");
         removeItemButton.addActionListener(new ActionListener() {
             @Override
@@ -155,7 +182,7 @@ public class NovaInspecao extends JFrame {
         gbc.fill = GridBagConstraints.NONE;
         add(buttons, gbc);
 
-        // Button to Generate Report
+        // botão gerar relatório
         JButton exportPdfButton = new JButton("Exportar para PDF");
         exportPdfButton.addActionListener(new ActionListener() {
             @Override
@@ -247,14 +274,90 @@ public class NovaInspecao extends JFrame {
             }
         });
 
-        // Adicionar o botão na interface gráfica
+        JButton saveData = new JButton("Salvar Relatório");
+        saveData.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String cliente = ((Clientes) Objects.requireNonNull(clienteComboBox.getSelectedItem())).getDisplayName();
+                String pedidoCompra = pedidoCompraField.getText();
+                int rowCount = tableModel.getRowCount();
+
+                if (cliente.isEmpty() || pedidoCompra.isEmpty() || rowCount == 0) {
+                    JOptionPane.showMessageDialog(null, "Preencha todos os campos e adicione ao menos um item antes de salvar.");
+                    return;
+                }
+
+                try {
+                    JSONObject inspecaoJson = new JSONObject();
+                    inspecaoJson.put("cliente", cliente);
+                    inspecaoJson.put("pedidoCompra", pedidoCompra);
+                    inspecaoJson.put("data", LocalDate.now().toString());
+
+                    JSONArray itensArray = new JSONArray();
+                    for (int i = 0; i < rowCount; i++) {
+                        JSONObject itemJson = new JSONObject();
+                        itemJson.put("codigo", tableModel.getValueAt(i, 0));
+
+                        String imagePath = (String) tableModel.getValueAt(i, 1);
+
+                        if (imagePath != null && !imagePath.isEmpty()) {
+                            try {
+                                String base64Image = encodeImageToBase64(imagePath);
+                                itemJson.put("imagem", base64Image);
+                            } catch (IOException ex) {
+                                JOptionPane.showMessageDialog(null, "Erro ao codificar a imagem: " + ex.getMessage());
+                                return;
+                            }
+                        } else {
+                            itemJson.put("imagem", JSONObject.NULL); // Caso nenhuma imagem tenha sido selecionada
+                        }
+
+                        itensArray.put(itemJson);
+                    }
+
+                    inspecaoJson.put("itens", itensArray);
+
+                    String urlInspecao = "http://localhost:8080/inspecao";
+                    HttpURLConnection connection = (HttpURLConnection) new URL(urlInspecao).openConnection();
+                    connection.setDoOutput(true);
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json");
+
+                    try (OutputStream os = connection.getOutputStream()) {
+                        byte[] input = inspecaoJson.toString().getBytes(StandardCharsets.UTF_8);
+                        os.write(input, 0, input.length);
+                    }
+
+                    int responseCode = connection.getResponseCode();
+                    if (responseCode == 201) {
+                        try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                            String responseBody = br.readLine();
+                            Long inspecaoId = Long.parseLong(responseBody);
+                            System.out.println("Inspeção criada com ID: " + inspecaoId);
+
+                            enviarItens(inspecaoId, itensArray);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Erro ao salvar a inspeção. Código: " + responseCode);
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Erro ao salvar a inspeção: " + ex.getMessage());
+                }
+            }
+        });
+
+
+        JPanel optionButtons = new JPanel();
+        optionButtons.add(exportPdfButton);
+        optionButtons.add(saveData);
+
+        // botões
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(10, 20, 20, 20);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(exportPdfButton, gbc);
-
+        add(optionButtons, gbc);
 
         // footer
         JPanel footer = Footer.createFooter();
@@ -266,5 +369,30 @@ public class NovaInspecao extends JFrame {
         add(footer, gbc);
 
         setVisible(true);
+    }
+
+    private static String encodeImageToBase64(String imagePath) throws IOException {
+        byte[] imageBytes = Files.readAllBytes(Path.of(imagePath));
+        return Base64.getEncoder().encodeToString(imageBytes);
+    }
+
+    private void enviarItens(Long inspecaoId, JSONArray itensArray) throws IOException {
+        String urlItens = "http://localhost:8080/inspecao/" + inspecaoId + "/itens";
+        HttpURLConnection connection = (HttpURLConnection) new URL(urlItens).openConnection();
+        connection.setDoOutput(true);
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = itensArray.toString().getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == 200 || responseCode == 201) {
+            JOptionPane.showMessageDialog(null, "Itens associados com sucesso!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Erro ao associar os itens. Código: " + responseCode);
+        }
     }
 }

@@ -1,12 +1,11 @@
 package com.newenergy.inspecao_rei.models.dtos;
 
-import com.newenergy.inspecao_rei.models.Item;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,5 +15,5 @@ public class InspecaoCreateDTO {
 
     private String cliente;
     private String pedidoCompra;
-    private List<Item> itens;
+    private LocalDate data;
 }

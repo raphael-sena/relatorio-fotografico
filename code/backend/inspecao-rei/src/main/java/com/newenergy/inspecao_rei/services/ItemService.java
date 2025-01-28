@@ -21,6 +21,9 @@ public class ItemService {
     @Autowired
     private InspecaoService inspecaoService;
 
+    @Autowired
+    private ImageService imageService;
+
     @Transactional
     public List<Item> findAll() {
         return itemRepository.findAll();
@@ -34,24 +37,26 @@ public class ItemService {
     }
 
     @Transactional
-    public void criarItem(ItemDTO obj) {
-        Item item = new Item();
-        item.setCodigo(obj.getCodigo());
-        item.setImagem(obj.getImagem());
-
-        if (obj.getInspecaoId() != null) {
-            Inspecao inspecao = inspecaoService.findById(obj.getInspecaoId());
-            item.setInspecao(inspecao);
+    public void criarItem(ItemDTO itemDTO, Long inspecaoId) {
+        // Verificar se a inspeção existe
+        Inspecao inspecao = inspecaoService.findById(inspecaoId);
+        if (inspecao == null) {
+            throw new EntityNotFoundException("Inspeção não encontrada");
         }
 
+        // Criar o item e associá-lo à inspeção
+        Item item = new Item();
+        item.setCodigo(itemDTO.getCodigo());
+        item.setInspecao(inspecao);
+        item.setImagem(imageService.decodeBase64Image(itemDTO.getImagem())); // Decodificando a imagem
+
+        // Salvar o item no banco
         itemRepository.save(item);
 
-        if (obj.getInspecaoId() != null) {
-            Inspecao inspecao = item.getInspecao();
-            if (!inspecao.getItens().contains(item)) {
-                inspecao.getItens().add(item);
-                inspecaoService.criarInspecao(inspecao);
-            }
+        // Adicionar o item à lista de itens da inspeção, caso ainda não esteja presente
+        if (!inspecao.getItens().contains(item)) {
+            inspecao.getItens().add(item);
+            inspecaoService.save(inspecao);
         }
     }
 
@@ -60,7 +65,7 @@ public class ItemService {
         Item oldItem = findById(obj.getId());
 
         oldItem.setCodigo(obj.getCodigo());
-        oldItem.setImagem(obj.getImagem());
+        oldItem.setImagem(obj.getImagem().getBytes());
 
         if (obj.getInspecaoId() != null) {
             Inspecao inspecao = inspecaoService.findById(obj.getInspecaoId());
@@ -85,5 +90,4 @@ public class ItemService {
 
         itemRepository.deleteById(id);
     }
-
 }

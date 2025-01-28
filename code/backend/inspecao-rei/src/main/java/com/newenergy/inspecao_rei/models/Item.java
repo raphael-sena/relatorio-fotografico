@@ -25,6 +25,7 @@ public class Item {
     private String codigo;
 
     @Column
+    @Lob
     private byte[] imagem;
 
     @ManyToOne(fetch = FetchType.EAGER)

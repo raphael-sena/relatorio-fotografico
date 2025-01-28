@@ -9,10 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ItemDTO {
-
-    private Long id;
+public class ItemInspecaoDTO {
     private String codigo;
-    private String imagem;
-    private Long inspecaoId;
+    private String imagemBase64;
 }

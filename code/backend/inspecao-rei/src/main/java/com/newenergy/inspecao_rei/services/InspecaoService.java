@@ -2,6 +2,7 @@ package com.newenergy.inspecao_rei.services;
 
 import com.newenergy.inspecao_rei.models.Inspecao;
 import com.newenergy.inspecao_rei.models.Item;
+import com.newenergy.inspecao_rei.models.dtos.InspecaoCreateDTO;
 import com.newenergy.inspecao_rei.models.dtos.InspecaoUpdateDTO;
 import com.newenergy.inspecao_rei.repositories.InspecaoRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,10 +32,10 @@ public class InspecaoService {
     }
 
     @Transactional
-    public Inspecao criarInspecao(Inspecao obj) {
+    public Inspecao criarInspecao(InspecaoCreateDTO obj) {
         Inspecao inspecao = new Inspecao();
         inspecao.setCliente(obj.getCliente());
-        inspecao.setData(LocalDate.now());
+        inspecao.setData(obj.getData());
         inspecao.setPedidoCompra(obj.getPedidoCompra());
         inspecao = inspecaoRepository.save(inspecao);
 

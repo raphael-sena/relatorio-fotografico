@@ -30,6 +30,9 @@ public class Inspecao {
     @Column(name = "pedido_compra")
     private String pedidoCompra;
 
-    @OneToMany(mappedBy = "inspecao", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "inspecao",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<Item> itens = new ArrayList<>();
 }
