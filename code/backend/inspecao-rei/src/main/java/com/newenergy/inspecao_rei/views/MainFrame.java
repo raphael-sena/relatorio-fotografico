@@ -3,13 +3,15 @@ package com.newenergy.inspecao_rei.views;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.util.List;
 
 public class MainFrame extends JFrame {
@@ -32,7 +34,6 @@ public class MainFrame extends JFrame {
         gbc.insets = new Insets(0, 20, 10, 20); // Espaçamento
         add(boasVindas, gbc);
 
-        // Seção de conteúdo principal
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new GridLayout(1, 2, 20, 0)); // 1 linha, 2 colunas, espaçamento horizontal
 
@@ -40,7 +41,8 @@ public class MainFrame extends JFrame {
         JButton visualizarInspecaoButton = new JButton("Visualizar Inspeções");
 
         novaInspecaoButton.addActionListener(e -> {
-            System.out.println("Abrir tela de Nova Inspeção");
+
+            new NovaInspecao().setVisible(true);
         });
 
         visualizarInspecaoButton.addActionListener(e -> {
@@ -56,29 +58,8 @@ public class MainFrame extends JFrame {
         gbc.insets = new Insets(10, 20, 10, 20); // Espaçamento
         add(contentPanel, gbc);
 
-
         // footer
-        JLabel hyperlink = new JLabel("https://raphaelsena.com");
-        hyperlink.setForeground(Color.BLUE.darker());
-        hyperlink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        hyperlink.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                try {
-
-                    Desktop.getDesktop().browse(new URI("https://raphaelsena.com"));
-
-                } catch (IOException | URISyntaxException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
-
-        JPanel footer = new JPanel();
-        footer.setLayout(new FlowLayout(FlowLayout.CENTER));
-        footer.add(new JLabel("© 2025 - Todos os direitos reservados. Desenvolvido por Raphael Sena A. Brito -"));
-        footer.add(hyperlink);
+        JPanel footer = Footer.createFooter();
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2; // Ocupa duas colunas
