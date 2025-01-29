@@ -1,7 +1,12 @@
 package com.newenergy.inspecao_rei.controllers;
 
 import com.newenergy.inspecao_rei.models.Inspecao;
-import com.newenergy.inspecao_rei.models.dtos.*;
+import com.newenergy.inspecao_rei.models.Item;
+import com.newenergy.inspecao_rei.models.dtos.InspecaoCreateDTO;
+import com.newenergy.inspecao_rei.models.dtos.InspecaoDTO;
+import com.newenergy.inspecao_rei.models.dtos.InspecaoUpdateDTO;
+import com.newenergy.inspecao_rei.models.dtos.ItemDTO;
+import com.newenergy.inspecao_rei.models.dtos.ItemMinDTO;
 import com.newenergy.inspecao_rei.services.InspecaoService;
 import com.newenergy.inspecao_rei.services.ItemService;
 import jakarta.persistence.EntityNotFoundException;
@@ -64,6 +69,12 @@ public class InspecaoController {
         );
 
         return ResponseEntity.ok(inspecaoDTO);
+    }
+
+    @GetMapping("/{id}/itens")
+    public ResponseEntity<List<Item>> findItensByInspecao(@PathVariable Long id) {
+        List<Item> itens = inspecaoService.findItemsByInspecao(id);
+        return ResponseEntity.ok().body(itens);
     }
 
     @PostMapping

@@ -33,6 +33,8 @@ public class Menu {
 
         exitItem.addActionListener(e -> System.exit(0));
         home.addActionListener(e -> new MainFrame().setVisible(true));
+        newInspecao.addActionListener(e -> new NovaInspecao().setVisible(true));
+        openInspecoes.addActionListener(e -> new VisualizarInspecoes().setVisible(true));
         aboutItem.addActionListener(e -> JOptionPane.showMessageDialog(null, "Sobre o aplicativo"));
 
         return menuBar;

@@ -36,7 +36,12 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -50,8 +55,8 @@ import java.util.Objects;
 public class NovaInspecao extends JFrame {
 
     public NovaInspecao() {
-        setTitle("Inspeção REI - Nova Inspeção");
-        setSize(900, 600);
+        setTitle("Gerenciador de Relatórios Fotográficos - Nova Inspeção");
+        setSize(1280, 1024);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());

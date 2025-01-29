@@ -13,8 +13,8 @@ import java.awt.Insets;
 public class MainFrame extends JFrame {
 
     public MainFrame() {
-        setTitle("Inspeção REI - CEMIG");
-        setSize(900, 600);
+        setTitle("Gerenciador de Relatórios Fotográficos");
+        setSize(1280, 1024);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new GridBagLayout());
@@ -22,27 +22,28 @@ public class MainFrame extends JFrame {
 
         setJMenuBar(Menu.createMenu());
 
-        JLabel boasVindas = new JLabel("Bem-vindo, Humberto!");
+        String userName = System.getProperty("user.name");
+
+        JLabel boasVindas = new JLabel("Bem-vindo(a), " + userName + "!");
         boasVindas.setFont(new Font("Arial", Font.BOLD, 20));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2; // Ocupa duas colunas
-        gbc.insets = new Insets(0, 20, 10, 20); // Espaçamento
+        gbc.insets = new Insets(0, 20, 10, 20);
         add(boasVindas, gbc);
 
         JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new GridLayout(1, 2, 20, 0)); // 1 linha, 2 colunas, espaçamento horizontal
+        contentPanel.setLayout(new GridLayout(1, 2, 20, 0));
 
         JButton novaInspecaoButton = new JButton("Nova Inspeção");
         JButton visualizarInspecaoButton = new JButton("Visualizar Inspeções");
 
         novaInspecaoButton.addActionListener(e -> {
-
             new NovaInspecao().setVisible(true);
         });
 
         visualizarInspecaoButton.addActionListener(e -> {
-            System.out.println("Abrir tela de Inspeções Anteriores");
+            new VisualizarInspecoes().setVisible(true);
         });
 
         contentPanel.add(novaInspecaoButton);
